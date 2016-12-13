@@ -1,0 +1,5 @@
+.DS_Store
+NCMBDownloader-darwin-x64
+NCMBDownloader-win32-x64
+node_modules
+vendors

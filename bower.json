@@ -1,0 +1,23 @@
+{
+  "name": "data_downloader",
+  "description": "",
+  "main": "main.js",
+  "authors": [
+    "Atsushi Nakatsugawa <atsushi@moongift.jp>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ncmb": "^2.1.3",
+    "bootstrap": "3.3.7",
+    "jquery": "<3.0",
+    "vue": "^2.1.4"
+  }
+}

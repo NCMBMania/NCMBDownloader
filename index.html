@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <link rel="stylesheet" type="text/css" href="vendors/bootstrap/dist/css/bootstrap.min.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div id="app">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1>NCMBエクスポートシステム</h1>
+            <div v-if="message">
+              <div class="alert" v-bind:class="message.type">
+                {{message.message}}
+              </div>
+            </div>
+            <div v-if="ncmb">
+              <button v-on:click="remove_keys" class="btn btn-info">設定の変更</button>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <td><input type="checkbox" v-on:click="check_all" /></td>
+                    <td>クラス名</td>
+                    <td>処理結果</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(cl, i) in classes">
+                    <td>
+                      <input type="checkbox" v-model="cl.checked" />
+                    </td>
+                    <td>
+                      {{cl.Name}}
+                    </td>
+                    <td>
+                      <div>{{cl.status}}</div>
+                    </td>
+                  </div>
+                </tbody>
+              </table>
+              <button class="btn btn-large btn-success" v-on:click="export_execute">エクスポート実行</button>
+            </div>
+            <div v-else>
+              <p>アプリケーションキー、クライアントキーの取得は<a v-on:click="open_mbaas">管理画面</a>より行えます。</p>
+              <form v-on:submit="register_keys">
+                <div class="form-group">
+                  <label for="inputApplicationKey">アプリケーションキー</label>
+                  <input type="text" class="form-control" id="application_key" v-model="application_key" placeholder="アプリケーションキー">
+                </div>
+                <div class="form-group">
+                  <label for="inputClientKey">クライアントキー</label>
+                  <input type="text" class="form-control" id="client_key" v-model="client_key" placeholder="クライアントキー">
+                </div>
+                <div class="form-group">
+                  <label for="inputUserName">ユーザ名</label>
+                  <input type="text" class="form-control" id="userName" v-model="userName" placeholder="ユーザ名">
+                </div>
+                <div class="form-group">
+                  <label for="inputPassword">パスワード</label>
+                  <input type="password" class="form-control" id="password" v-model="password" placeholder="パスワード">
+                </div>
+                <div class="form-group">
+                  <label for="inputPassword">ファイルの保存先フォルダ名</label>
+                  <input type="text" class="form-control" id="savePath" v-model="savePath" placeholder="C:\\Users\YourName\Downloads\">
+                </div>
+                <button type="submit" class="btn btn-default">登録</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="vendors/jquery/dist/jquery.min.js"></script>
+    <script src="vendors/vue/dist/vue.min.js"></script>
+    <script src="vendors/ncmb/ncmb.min.js"></script>
+    <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

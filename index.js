@@ -162,7 +162,7 @@ var exportToCSV = function(ncmb, className, outputFileName) {
   loop(0)
     .then(function() {
       csv = data2CSV(data);
-      fs.writeFile(outputFileName, csv.join("\r\n"), function(err) {
+      fs.writeFile(outputFileName, "\ufeff" + csv.join("\r\n"), function(err) {
         if (err) throw err;
         className.status = `保存しました。${outputFileName}`;
         console.log("File saved. " + outputFileName);
@@ -185,7 +185,7 @@ var data2CSV = function(data) {
       }
     }
   }
-  csv = [header.join("\t")];
+  csv = [header.join(",")];
   for(var i in data) {
     var row = data[i];
     var line = [];
@@ -220,7 +220,7 @@ var data2CSV = function(data) {
         }
       }
     }
-    csv.push('"' + line.join('"\t"') + '"');
+    csv.push('"' + line.join('","') + '"');
   }
   return csv;
 }

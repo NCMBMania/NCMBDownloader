@@ -3,3 +3,6 @@ NCMBDownloader-darwin-x64
 NCMBDownloader-win32-x64
 node_modules
 vendors
+NCMBDownloader-darwin-x64
+NCMBDownloader-darwin-x64.zip NCMBDownloader-win32-x64.zip
+*.zip

@@ -1,5 +1,6 @@
 const {shell} = require('electron')
 var fs = require('fs')
+var path = require('path')
 
 var app = null;
 var ary = ['application_key', 'client_key', 'userName', 'password', 'savePath'];
@@ -15,15 +16,7 @@ if (data.application_key && data.client_key) {
   data.ncmb = new NCMB(data.application_key, data.client_key);
   authentication(data.ncmb, data.userName, data.password)
     .then(() => {
-      var Export = data.ncmb.DataStore('Export');
-      Export.fetchAll()
-        .then((ary) => {
-          for (var i in ary) {
-            ary[i].checked = false;
-            ary[i].status = "";
-            (app || data).classes.push(ary[i]);
-          }
-        })
+      getAllExport(data.ncmb);
     }, (err) => {
       data.message = err;
       setTimeout(() => {
@@ -32,6 +25,26 @@ if (data.application_key && data.client_key) {
     });
 }
 data.message = null;
+
+function getAllExport(ncmb) {
+  app.classes = [];
+  var Export = ncmb.DataStore('Export');
+  Export.fetchAll()
+    .then((ary) => {
+      for (var i in ary) {
+        ary[i].checked = false;
+        ary[i].status = "";
+        app.classes.push(ary[i]);
+      }
+      app.message = {
+        message: "取得完了しました",
+        type: "alert-success"
+      }
+      setTimeout(() => {
+        data.message = null;
+      }, 1000)
+    })
+}
 
 function authentication(ncmb, userName, password) {
   return new Promise((res, rej) => {
@@ -76,6 +89,7 @@ app = new Vue({
       app.ncmb = new NCMB(app.application_key, app.client_key);
       authentication(app.ncmb, app.userName, app.password)
         .then(() => {
+          getAllExport(app.ncmb);
         }, (err) => {
           app.message = err;
           setTimeout(() => {
@@ -91,8 +105,14 @@ app = new Vue({
         app.classes[i].checked = true;
       }
     },
+    reload_class: (e) => {
+      getAllExport(app.ncmb);
+    },
     export_execute: (e) => {
       e.preventDefault();
+      if (app.savePath[app.savePath.length - 1] != path.sep) {
+        app.savePath = app.savePath + path.sep;
+      }
       var classes = app.classes.filter(function(d) {
         if (d.checked)
           return d;

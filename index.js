@@ -1,8 +1,10 @@
-const {shell} = require('electron')
+const electron = require('electron')
+const shell = electron.shell;
+
 var fs = require('fs')
 var path = require('path')
 
-var app = null;
+var ncmbApp = null;
 var ary = ['application_key', 'client_key', 'userName', 'password', 'savePath'];
 var data = {};
 for (var i in ary) {
@@ -27,16 +29,16 @@ if (data.application_key && data.client_key) {
 data.message = null;
 
 function getAllExport(ncmb) {
-  app.classes = [];
+  ncmbApp.classes = [];
   var Export = ncmb.DataStore('Export');
   Export.fetchAll()
     .then((ary) => {
       for (var i in ary) {
         ary[i].checked = false;
         ary[i].status = "";
-        app.classes.push(ary[i]);
+        ncmbApp.classes.push(ary[i]);
       }
-      app.message = {
+      ncmbApp.message = {
         message: "取得完了しました",
         type: "alert-success"
       }
@@ -51,7 +53,7 @@ function authentication(ncmb, userName, password) {
     if (userName && password) {
       ncmb.User.login(userName, password)
         .then(() => {
-          app.message = {
+          ncmbApp.message = {
             message: "ログイン成功しました",
             type: "alert-success"
           }
@@ -72,7 +74,7 @@ function authentication(ncmb, userName, password) {
   });
 }
 
-app = new Vue({
+ncmbApp = new Vue({
   el: '#app',
   data: data,
   methods: {
@@ -84,44 +86,58 @@ app = new Vue({
       for (var i in ary) {
         var key = ary[i];
         localStorage.setItem(key, e.target[key].value);
-        app[key] = e.target[key].value;
+        ncmbApp[key] = e.target[key].value;
       }
-      app.ncmb = new NCMB(app.application_key, app.client_key);
-      authentication(app.ncmb, app.userName, app.password)
+      ncmbApp.ncmb = new NCMB(ncmbApp.application_key, ncmbApp.client_key);
+      authentication(ncmbApp.ncmb, ncmbApp.userName, ncmbApp.password)
         .then(() => {
-          getAllExport(app.ncmb);
+          getAllExport(ncmbApp.ncmb);
         }, (err) => {
-          app.message = err;
+          ncmbApp.message = err;
           setTimeout(() => {
-            app.message = null;
+            ncmbApp.message = null;
           }, 3000)
         })
     },
     remove_keys: (e) => {
-      app.ncmb = null;
+      ncmbApp.ncmb = null;
     },
     check_all: (e) => {
-      for (var i in app.classes) {
-        app.classes[i].checked = true;
+      for (var i in ncmbApp.classes) {
+        ncmbApp.classes[i].checked = true;
       }
     },
     reload_class: (e) => {
-      getAllExport(app.ncmb);
+      getAllExport(ncmbApp.ncmb);
     },
     export_execute: (e) => {
       e.preventDefault();
-      if (app.savePath[app.savePath.length - 1] != path.sep) {
-        app.savePath = app.savePath + path.sep;
+      if (ncmbApp.savePath[ncmbApp.savePath.length - 1] != path.sep) {
+        ncmbApp.savePath = ncmbApp.savePath + path.sep;
       }
-      var classes = app.classes.filter(function(d) {
+      var classes = ncmbApp.classes.filter(function(d) {
         if (d.checked)
           return d;
       });
       for (var i in classes) {
         var className = classes[i];
         var d = new Date;
-        exportToCSV(app.ncmb, className, `${app.savePath}${className.Name}-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}.csv`)
+        exportToCSV(ncmbApp.ncmb, className, `${ncmbApp.savePath}${className.Name}-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}.csv`)
       }
+    },
+    reset_app: (e) => {
+      e.preventDefault();
+      if (confirm("リセットしてよろしいですか？")) {
+        for (var i in ary) {
+          var key = ary[i];
+          localStorage.removeItem(key);
+        }
+        alert("リセットしました。アプリを終了しますのでもう一度立ち上げてください");
+        require('electron').remote.app.quit();
+      }
+    },
+    open_devtools: (e) => {
+      require('electron').remote.getCurrentWindow().openDevTools();
     }
   }
 });
